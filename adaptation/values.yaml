@@ -39,4 +39,4 @@ imagestore:
     tag: main-c1836fc
   adaptationservice:
     image: glasswallsolutions/icap-adaptation-service
-    tag: main-827e486
+    tag: main-08d071c
