@@ -2,12 +2,10 @@ environment:
 serviceAccount:
   adaptationname: adaptation-service-sa
   janitorname: pod-janitor-sa
-
 volumemountpath:
   source: "/var/source"
-  target: "/var/target"  
-  
-queue:  
+  target: "/var/target"
+queue:
   host:
     url: "rabbitmq-service"
     port: "\"5672\""
@@ -17,33 +15,28 @@ queue:
     exchangename: "adaptation-exchange"
     requestqueuename: "adaptation-request-queue"
     replyqueuename: "amq.rabbitmq.reply-to"
-    messagename: "adaptation-request"  
-  
+    messagename: "adaptation-request"
 adaptationservice:
   name: adaptation-service
   namespace: icap-adaptation
   replicas: 1
   amqpurl: "amqp://guest:guest@rabbitmq-service:5672/"
   rolename: adaptation-service-role
-
 icapservice:
   name: mvp-icap-service
   applabel: adaptation
   replicas: 1
   port: 1344
-  
 icapserviceconfig:
   processingtimeoutduration: 00:01:00
-
 podjanitor:
   name: pod-janitor
   namespace: icap-adaptation
   rolename: janitor-role
-
 imagestore:
   requestprocessing:
     image: glasswallsolutions/icap-request-processing
     tag: main-c1836fc
   adaptationservice:
     image: glasswallsolutions/icap-adaptation-service
-    tag: main-73b04a5
+    tag: main-4b149b1
