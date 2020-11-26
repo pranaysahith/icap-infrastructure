@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: {{ .Values.archiveadaptationservice.name }}
+spec:
+  replicas: {{ .Values.archiveadaptationservice.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.archiveadaptationservice.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.archiveadaptationservice.name }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.archiveadaptationname  }}
+      containers:
+      - name: adaptation-service
+        image: {{ .Values.imagestore.archiveadaptationservice.registry }}{{ .Values.imagestore.archiveadaptationservice.repository }}:{{ .Values.imagestore.archiveadaptationservice.tag }}
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: EXCHANGE
+          value: {{ .Values.archiveadaptationservice.exchange }}
+        - name: INPUT_MOUNT
+          value: {{ .Values.volumemountpath.source }}
+        - name: OUTPUT_MOUNT
+          value: {{ .Values.volumemountpath.target }}
+        - name: ARCHIVE_PROCESSING_IMAGE
+          value: {{ .Values.imagestore.archiveprocessingservice.registry }}{{ .Values.imagestore.archiveprocessingservice.repository }}:{{ .Values.imagestore.archiveprocessingservice.tag }}
+        - name: ARCHIVE_PROCESSING_TIMEOUT
+          value: {{ .Values.icapserviceconfig.processingtimeoutduration }}
+        - name: ARCHIVE_ADAPTATION_REQUEST_QUEUE_HOSTNAME
+          value: {{ .Values.queue.archiveadaptationrequest.hostname}}
+        - name: ARCHIVE_ADAPTATION_REQUEST_QUEUE_PORT
+          value: {{ .Values.queue.archiveadaptationrequest.port}}
+        - name: ADAPTATION_REQUEST_QUEUE_HOSTNAME
+          value: {{ .Values.queue.adaptationRequest.hostname}}
+        - name: ADAPTATION_REQUEST_QUEUE_PORT
+          value: {{ .Values.queue.adaptationRequest.port}}
+        {{- if .Values.queue.messagebrokeruser }}
+        - name: MESSAGE_BROKER_USER
+          value: {{ .Values.queue.messagebrokeruser }}
+        {{- end }}
+        {{- if .Values.queue.messagebrokerpassword }}
+        - name: MESSAGE_BROKER_PASSWORD
+          value: {{ .Values.queue.messagebrokerpassword }}
+        {{- end }}  
+        resources:
+          limits:
+            cpu: 1
+            memory: 500Mi
+          requests:
+            cpu: 0.5
+            memory: 100Mi

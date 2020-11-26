@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.policymanagementapi.fullnameOverride }}
+  labels:
+    app: {{ template "policy-management-api.name" . }}
+    chart: {{ template "policy-management-api.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.policymanagementapi.service.type }}
+  ports:
+    - port: {{ .Values.policymanagementapi.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "policy-management-api.name" . }}
+    release: {{ .Release.Name }}

@@ -10,5 +10,8 @@ spec:
     app: {{ .Values.icapservice.applabel }}
   ports:
   - port: 1344
-    targetPort:  {{ .Values.icapservice.port }}
-
+    name: openport
+    targetPort: {{ .Values.icapservice.port }}
+  - port: 1345
+    name: tlsport
+    targetPort: {{ .Values.icapservice.tlsport }}

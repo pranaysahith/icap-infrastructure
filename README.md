@@ -25,6 +25,42 @@ kubectl create -n icap-adaptation secret docker-registry regcred	\
 	--docker-email=<email address>
 ```
 
+Create Self-signed TLS Certificate
+```
+openssl req -newkey rsa:2048 -nodes -keyout  tls.key -x509 -days 365 -out certificate.crt
+```
+
+Create TLS Certificate Secret
+```
+kubectl create secret tls icap-service-tls-config --namespace icap-adaptation --key tls.key --cert certificate.crt
+```
+
+Create Transaction Store Secret
+```
+$resource_group=<resource name to create and use>
+$storage_account=<sttorage account to create and use>
+$location="uksouth"
+
+az group create --name $resource_group --location $location
+
+az storage account create --name $storage_account --resource-group $resource_group --location $location --sku Standard_ZRS
+
+$sa_key=$(az storage account keys list -g $resource_group -n $storage_account  --query [0].value)
+
+kubectl create -n icap-adaptation secret generic transactionstoresecret \
+   --from-literal=accountName=$storage_account \
+   --from-literal=accountKey=$sa_key
+   
+```
+
+Create Policy Update Service Secret
+```
+kubectl create -n icap-adaptation secret generic policyupdateservicesecret \
+   --from-literal=username=policy-management \
+   --from-literal=password='long-password'
+```
+
+
 Install the cluster components
 ```
 helm install . --namespace icap-adaptation --generate-name
@@ -33,10 +69,12 @@ helm install . --namespace icap-adaptation --generate-name
 The cluster's services should now be deployed
 ```
 > kubectl get pods -n icap-adaptation
-NAME                                 READY   STATUS    RESTARTS   AGE
-adaptation-service-64cc49f99-kwfp6   1/1     Running   0          3m22s
-mvp-icap-service-b7ddccb9-gf4z6      1/1     Running   0          3m22s
-rabbitmq-controller-747n4            1/1     Running   0          3m22s
+NAME                                           READY   STATUS      RESTARTS   AGE
+adaptation-service-79b84ccf89-cfgsf            1/1     Running     4          16m
+event-submission-service-546547997-znh8q       1/1     Running     0          16m
+mvp-icap-service-56767d8984-xcd6g              1/1     Running     0          16m
+policy-update-service-8f5f9d756-t8rj9          1/1     Running     0          16m
+rabbitmq-controller-btmtj                      1/1     Running     0          16m
 ```
 
 If required, the following steps provide access to the RabbitMQ Management Console
@@ -159,5 +197,5 @@ kubectl create ns transaction-event-api
 Next use Helm to deploy the chart
 
 ```
-helm install ./administration/transactioneventapi --namespace management-ui --generate-name
+helm install ./administration/transactioneventapi --namespace transaction-event-api --generate-name
 ```

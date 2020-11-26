@@ -1,0 +1,73 @@
+# Default values for policy-management-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+fullnameOverride: ncfs-policy-update-service
+replicaCount: 1
+imagePullSecrets: []
+# Optionally specify an array of imagePullSecrets.
+# Secrets must be manually created in the namespace.
+# ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
+#
+# This uses credentials from secret "myRegistryKeySecretName".
+# - name: myRegistryKeySecretName
+deployment:
+  containerPort: 80
+probes:
+  enabled: false
+ingress:
+  enabled: false
+  annotations: {}
+  # kubernetes.io/tls-acme: "true"
+  path: /
+  # hosts:
+  #   - chart-example.local
+  tls: []
+  # - secretName: chart-example-tls
+  #   hosts:
+  #     - chart-example.local
+secrets: {}
+# Optionally specify a set of secret objects whose values
+# will be injected as environment variables by default.
+# You should add this section to a file like secrets.yaml
+# that is explicitly NOT committed to source code control
+# and then include it as part of your helm install step.
+# ref: https://kubernetes.io/docs/concepts/configuration/secret/
+#
+# This creates a secret "mysecret" and injects "mypassword"
+# as the environment variable mysecret_mypassword=password.
+# mysecret:
+#   mypassword: password
+ncfspolicyupdateservice:
+  name: ncfs-policy-update-service
+  applabel: ncfspolicyupdate
+  replicas: 1
+  port: 10001
+  rolename: ncfs-role
+  
+referencencfsservice:
+  configmapname: reference-ncfs-service-config
+  namespace: reference-ncfs-service
+
+serviceAccount:
+  ncfspolicyupdatename: policy-update-service-sa
+  namespace: ncfs-policy-update-service
+
+resources: {}
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# limits:
+#  cpu: 100m
+#  memory: 128Mi
+# requests:
+#  cpu: 100m 
+#  memory: 128Mi
+nodeSelector: {}
+tolerations: []
+affinity: {}
+imagestore:
+  ncfspolicyupdateservice:
+    registry: ""
+    repository: glasswallsolutions/ncfs-policy-update-service
+    tag: main-4701285

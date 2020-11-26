@@ -1,0 +1,9 @@
+{{- $root := . }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "policy-management-api.fullname" $root }}-policy-configuration
+data:
+  {{- range $key, $value := .Values.policymanagementapi.configuration }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
