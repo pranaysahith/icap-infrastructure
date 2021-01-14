@@ -1,7 +1,7 @@
-{{- if .Values.transactioneventapi.ingress.enabled -}}
-{{- $fullName := include "transactioneventapi.fullname" . -}}
-{{- $servicePort := .Values.transactioneventapi.service.port -}}
-{{- $ingressPath := .Values.transactioneventapi.ingress.path -}}
+{{- if .Values.transactionqueryservice.ingress.enabled -}}
+{{- $fullName := include "transactionqueryservice.fullname" . -}}
+{{- $servicePort := .Values.transactionqueryservice.service.port -}}
+{{- $ingressPath := .Values.transactionqueryservice.ingress.path -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
@@ -11,15 +11,15 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    app: {{ template "icap-administration.name" . }}-transactioneventapi
+    app: {{ template "icap-administration.name" . }}-transactionqueryservice
 {{- with .Values.ingress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
-{{- if .Values.transactioneventapi.ingress.tls }}
+{{- if .Values.transactionqueryservice.ingress.tls }}
   tls:
-  {{- range .Values.transactioneventapi.ingress.tls }}
+  {{- range .Values.transactionqueryservice.ingress.tls }}
     - hosts:
       {{- range .hosts }}
         - {{ . }}
@@ -28,7 +28,7 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- range .Values.transactioneventapi.ingress.hosts }}
+  {{- range .Values.transactionqueryservice.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:

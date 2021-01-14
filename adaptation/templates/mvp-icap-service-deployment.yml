@@ -25,6 +25,19 @@ spec:
               name: icap-service-config
           - configMapRef:
               name: icap-proxy-app-config
+          {{- if .Values.queue.messagebrokersecret }}
+          env:
+            - name: MBUsername
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.queue.messagebrokersecret }}
+                  key: username
+            - name: MBPassword
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.queue.messagebrokersecret }}
+                  key: password
+          {{- end }}
           volumeMounts:
             - name: source-vol
               mountPath: {{ .Values.volumemountpath.source }}
@@ -33,6 +46,8 @@ spec:
             - name: tls-config-vol
               mountPath: /usr/local/c-icap/cert
               readOnly: true
+      imagePullSecrets:
+        - name: adaptation-registry-credential
       volumes:
         - name: source-vol
           persistentVolumeClaim:
