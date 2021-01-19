@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "reference-ncfs.fullname" . }}-service
+  labels:
+    app: {{ template "reference-ncfs.name" . }}
+    chart: {{ template "reference-ncfs.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.referencencfs.service.type }}
+  selector:
+    app: {{ template "reference-ncfs.name" . }}
+  ports:
+  - port: {{ .Values.referencencfs.service.port }}
+    targetPort: {{ .Values.referencencfs.service.port }}
+    protocol: TCP

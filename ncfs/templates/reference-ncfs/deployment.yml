@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "reference-ncfs.fullname" . }}
+  labels:
+    app: {{ template "reference-ncfs.name" . }}
+    chart: {{ template "reference-ncfs.chart" . }}
+    draft: {{ .Values.draft | default "draft-app" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.referencencfs.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "reference-ncfs.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "reference-ncfs.name" . }}
+    spec:
+      serviceAccountName: {{ template "reference-ncfs.fullname" . }}-service-account
+      containers:    
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.imagestore.referencencfs.registry}}{{ .Values.imagestore.referencencfs.repository }}:{{ .Values.imagestore.referencencfs.tag }}
+        ports:
+        - containerPort: {{ .Values.referencencfs.service.port }}
+        env: 
+          - name: ASPNETCORE_URLS
+            value: "https://+:443"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Values.referencencfs.configmapname }}

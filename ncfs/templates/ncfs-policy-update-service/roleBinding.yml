@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "ncfs-policy-update-service.fullname" . }}-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: ncfs-policy-update-service-account
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole #this must be Role or ClusterRole
+  name: {{ template "ncfs-policy-update-service.fullname" . }}-role
+  apiGroup: rbac.authorization.k8s.io 

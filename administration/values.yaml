@@ -18,7 +18,7 @@ policymanagementapi:
     type: ClusterIP
     port: 443
   shareName: transactions
-  storage: 100Gi
+  storage: 20Gi
   configuration:
     ASPNETCORE_URLS: "https://+:443"
   deployment:
@@ -74,7 +74,7 @@ identitymanagementservice:
   replicaCount: 1
   imagePullSecrets: []
   shareName: transactions
-  storage: 100Gi
+  storage: 20Gi
   service:
     type: ClusterIP
     port: 443
