@@ -14,12 +14,11 @@ Follow the below steps to deploy icap-server in AWS.
   
 - Select below configarature for next steps:
         
-        - Instance type     :     c4.8xlarge ( For load testing we generally use c4.8xlarge but ask to requester which flavour he wants to use ) 
-        - Instance count    :     The amount of requested instances 
-        - Disk space        :     At least 50G
-        - Security Groups   :     Inbound rules: 22, 80, 443, 1344, 1345, 5601, 9100, 31829
-                                  Outbound rules: All traffic
-        - Private key       :     Choose existing or create a new pem file.
+        - Instance type          :     c4.8xlarge ( For load testing we generally use c4.8xlarge but ask to requester which flavour he wants to use ) 
+        - Instance count         :     The amount of requested instances 
+        - Disk space             :     At least 50G
+        - Security Group Name    :     launch-wizard-8 
+        - Private key            :     Choose existing or create a new pem file.
                            
     ![image](https://user-images.githubusercontent.com/64204445/105377964-57bba400-5c31-11eb-8c92-b80d419a8e82.png)        
         
