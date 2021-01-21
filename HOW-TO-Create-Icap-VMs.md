@@ -4,27 +4,28 @@ Follow the below steps to deploy icap-server in AWS.
 
 - Login to aws console https://aws.amazon.com/console/
 - Go to EC2 service
-- Choose "eu-west-1" region
-- Choose "AMI" under "Images" from left Sidebar under 
-- Click twice on "Creation Date" column to get latest AMIs
+- Choose Ireland, "eu-west-1" region
+- Search for "AMI" under "Images"
+- Sort "Creation Date" column to get latest AMIs
 - Select latest AMI with name "icap-server"
 - Click on "Launch" button
 
     ![image](https://user-images.githubusercontent.com/64204445/105376034-525d5a00-5c2f-11eb-9971-94350e4b3793.png)
   
-- Select below configarature for next steps:
+- Select below configarature for next steps (available on bottom right corner):
         
-        - Instance type          :     c4.8xlarge ( For load testing we generally use c4.8xlarge but ask to requester which flavour he wants to use ) 
-        - Instance count         :     The amount of requested instances 
-        - Disk space             :     At least 50G
-        - Security Group Name    :     launch-wizard-8 
-        - Private key            :     Choose existing or create a new pem file.
+        - Choose Instance Type         :     c4.8xlarge ( For load testing we generally use c4.8xlarge but ask to requester which flavour he wants to use ) 
+        - Configure Instance Details   :     The amount of requested instances 
+        - Add Storage (disk space)     :     At least 50G
+        - Add Tags                     :     Can be skipped
+        - Configure Security Group     :     Choose to select from existing groups, and select *launch-wizard-8*
                            
-    ![image](https://user-images.githubusercontent.com/64204445/105377964-57bba400-5c31-11eb-8c92-b80d419a8e82.png)        
-        
-    ![image](https://user-images.githubusercontent.com/64204445/105377004-5a69c980-5c30-11eb-90d7-97a60b6a95ff.png)
+
+    ![Capture](https://user-images.githubusercontent.com/70108899/105423322-98bdb380-5c45-11eb-87fc-491b2218e612.PNG)
+
+- Once you verify above details, `LAUNCH` the instance. You will be prompt to enter privet key. Choose existing or create a new pem file.
     
-- Click "Launch" button and wait till the instance goes to running state
+- Wait untill the instance goes to running state
 
 - Get the Public IP of the instance
 
