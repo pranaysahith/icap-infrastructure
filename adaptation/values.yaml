@@ -106,15 +106,15 @@ imagestore:
   requestprocessing:
     registry: ""
     repository: glasswallsolutions/icap-request-processing
-    tag: main-ffd2a52
+    tag: develop-77b6369
   adaptationservice:
     registry: ""
     repository: glasswallsolutions/icap-adaptation-service
-    tag: main-718a5ce
+    tag: develop-35db718
   podjanitor:
     registry: ""
     repository: glasswallsolutions/pod-janitor
-    tag: main-b5f9752
+    tag: develop-dd4c0f8
   icapservice:
     registry: ""
     repository: glasswallsolutions/mvp-icap-service
@@ -134,7 +134,7 @@ imagestore:
   archiveadaptationservice:
     registry: ""
     repository: glasswallsolutions/archive-adaptation-service
-    tag: main-ddf071a
+    tag: develop-5b883e3
   archiveprocessingservice:
     registry: ""
     repository: glasswallsolutions/archive-processing-service
