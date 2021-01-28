@@ -5,7 +5,6 @@ metadata:
     app: {{ .Values.podjanitor.name }}
   name: {{ .Values.podjanitor.name }}
 spec:
-  startingDeadlineSeconds: 200
   schedule: "*/1 * * * *"
   jobTemplate:
      metadata:
@@ -25,6 +24,7 @@ spec:
               - --pod-namespace={{ .Release.Namespace }}
               - --delete-successful-after={{ .Values.podjanitor.deleteSuccessfulAfter }}
               - --delete-failed-after={{ .Values.podjanitor.deleteFailedAfter }}
+              - --pushgateway-endpoint={{ .Values.prometheus.pushgatewayendpoint }}              
               resources:
                 limits:
                   cpu: 100m
