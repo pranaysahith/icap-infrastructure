@@ -56,6 +56,50 @@ icapservice:
   enableFileId: true
 icapserviceconfig:
   processingtimeoutduration: 00:01:00
+cicapservice:
+  conf:
+    PidFile: /var/run/c-icap/c-icap.pid
+    CommandsSocket: /var/run/c-icap/c-icap.ctl
+    Timeout: 300
+    MaxKeepAliveRequests: 100
+    KeepAliveTimeout: 600
+    StartServers: 3
+    MaxServers: 10
+    MinSpareThreads: 10
+    MaxSpareThreads: 20
+    ThreadsPerChild: 10
+    MaxRequestsPerChild: 0
+    Port: 1344
+    TlsPort: 1345 tls-method=TLSv1_2 cert=/usr/local/c-icap/cert/tls.crt key=/usr/local/c-icap/cert/tls.key
+    ServerAdmin: you@your.address
+    ServerName: YourServerName
+    TmpDir: /var/tmp
+    MaxMemObject: 131072
+    DebugLevel: 10
+    Pipelining: !!string on
+    SupportBuggyClients: !!string off
+    ModulesDir: /usr/local/c-icap/lib/c_icap
+    ServicesDir: /usr/local/c-icap/lib/c_icap
+    TemplateDir: /usr/local/c-icap/share/c_icap/templates/
+    TemplateDefaultLanguage: en
+    LoadMagicFile: /usr/local/c-icap/etc/c-icap.magic
+    RemoteProxyUsers: !!string off
+    RemoteProxyUserHeader: X-Authenticated-User
+    RemoteProxyUserHeaderEncoded: !!string on
+    ServerLog: /proc/self/fd/1
+    AccessLog: /proc/self/fd/1
+    Service: echo srv_echo.so
+    Include: gw_rebuild.conf
+  rebuild:
+    Service: gw_rebuild gw_rebuild.so
+    gw_rebuild.MaxObjectSize: 2000M
+    gw_rebuild.Allow204Responses: !!string on
+    gw_rebuild.ProxyAppLocation: /usr/local/bin/cloud-proxy-app
+    gw_rebuild.DataCleanup: !!string on
+icapservicemetricsexporter:
+  icaphost: localhost
+  icapport: 1344
+  service: info?view=text
 podjanitor:
   name: pod-janitor
   namespace: icap-adaptation
