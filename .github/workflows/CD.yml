@@ -1,4 +1,4 @@
-name: CD Prod
+name: CD
 env:
   REPOSITORY: pranaysahith
   IMAGE: k8-proxy-icap-management-ui
@@ -11,7 +11,7 @@ on:
         required: false
       icap_branch:
         description: k8-proxy/icap-infrastructure branch to use
-        default: main
+        default: k8-develop
         required: false
       icap_ami:
         description: ICAP server AMI ID
@@ -63,7 +63,7 @@ jobs:
           ami_id=${{ github.event.inputs.icap_ami }}
           instance_id=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${BRANCH}-icap-server" "Name=instance-state-name,Values=running" --output text --query 'Reservations[*].Instances[*].InstanceId')
           if [[ -z "$instance_id" ]]; then
-            result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.large --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=${BRANCH}-icap-server}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_ID, $ami_id}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
+            result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.large --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=${BRANCH}-icap-server}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_ID, Value=$ami_id}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
             instance_id=$(echo $result | jq -r ".Instances[0].InstanceId")
             echo "Creating new instance $instance_id with $ami_id AMI"
             sleep 10m
