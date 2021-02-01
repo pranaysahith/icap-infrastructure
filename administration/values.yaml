@@ -10,6 +10,7 @@ managementui:
   config:
     transactionEventApiUrl: https://transaction-query-aggregator/api/v1
     policyManagementApiUrl: https://policy-management-api/api/v1
+    identityManagementApiUrl: https://identity-management-service/api/v1
 policymanagementapi:
   name: policy-management-api
   replicaCount: 1
@@ -98,19 +99,19 @@ imagestore:
   icapmanagementui:
     registry: ""
     repository: glasswallsolutions/icap-management-ui
-    tag: main-4c47628
+    tag: develop-2893798
   policymanagementapi:
     registry: ""
     repository: glasswallsolutions/policy-management-api
-    tag: main-07d2b18
+    tag: develop-64c36a0
   transactionqueryaggregator:
     registry: ""
     repository: glasswallsolutions/transaction-query-aggregator
-    tag: main-51eb7d5
+    tag: develop-52a75f6
   identitymanagementservice:
     registry: ""
     repository: glasswallsolutions/identity-management-service
-    tag: main-95753e1
+    tag: develop-86e8db1
 secrets:
   containerregistry:
     dockerconfigjson: "<<https://gw-icap-keyvault.vault.azure.net/secrets/az-registry-dockerconfig>>"
