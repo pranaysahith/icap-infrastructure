@@ -39,7 +39,7 @@ jobs:
       - name: Docker Login
         uses: docker/login-action@v1.6.0
         with:
-          username: icapserviceaccount
+          username: k8serviceaccount
           password: ${{ secrets.ICAPDOCKERSECRET }}
       
       - name: Build and Push Docker Image
