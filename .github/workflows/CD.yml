@@ -22,9 +22,6 @@ on:
         default: eu-west-1
         required: false
 
-  push:
-    branches: [ k8-main, k8-develop, icap-main ]
-
 jobs:
   build-push-docker-image:
     name: Build and Push Docker Image
