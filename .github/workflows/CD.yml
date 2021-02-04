@@ -13,6 +13,9 @@ on:
         description: k8-proxy/icap-infrastructure branch to use
         default: k8-develop
         required: false
+      instance_ip:
+        description: ICAP server IP address
+        required: false
       icap_ami:
         description: ICAP server AMI ID
         default: ami-01a70964ff0bd2986
@@ -55,21 +58,26 @@ jobs:
       - name: Get or Create ec2 instance
         id: deploy
         run: |
-          # Get or Create an instance with name "<management-ui-branch>-icap-server"
-          BRANCH=$(echo ${{ github.event.inputs.management_ui_branch }} | cut -d"/" -f3)
-          ami_id=${{ github.event.inputs.icap_ami }}
-          instance_id=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${BRANCH}-icap-server" "Name=instance-state-name,Values=running" --output text --query 'Reservations[*].Instances[*].InstanceId')
-          if [[ -z "$instance_id" ]]; then
-            result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.xlarge --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=${BRANCH}-icap-server}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_ID, Value=$ami_id}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
-            instance_id=$(echo $result | jq -r ".Instances[0].InstanceId")
-            echo "Creating new instance $instance_id with $ami_id AMI"
-            sleep 10m
+          INSTANCE_IP=${{ github.event.inputs.instance_ip }}
+          if [[ ! -z $INSTANCE_IP ]]; then
+            echo ::set-output name=instance_ip::$INSTANCE_IP
           else
-            echo "Using existing instance - $instance_id"
+            # Get or Create an instance with name "<management-ui-branch>-icap-server"
+            BRANCH=$(echo ${{ github.event.inputs.management_ui_branch }} | cut -d"/" -f3)
+            ami_id=${{ github.event.inputs.icap_ami }}
+            instance_id=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${BRANCH}-icap-server" "Name=instance-state-name,Values=running" --output text --query 'Reservations[*].Instances[*].InstanceId')
+            if [[ -z "$instance_id" ]]; then
+              result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.xlarge --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=${BRANCH}-icap-server}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_ID, Value=$ami_id}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
+              instance_id=$(echo $result | jq -r ".Instances[0].InstanceId")
+              echo "Creating new instance $instance_id with $ami_id AMI"
+              sleep 10m
+            else
+              echo "Using existing instance - $instance_id"
+            fi
+            instance_description=$(aws ec2 describe-instances --instance-ids $instance_id)
+            instance_ip=$(echo $instance_description | jq -r ".Reservations[0].Instances[0].PublicIpAddress")
+            echo ::set-output name=instance_ip::$instance_ip
           fi
-          instance_description=$(aws ec2 describe-instances --instance-ids $instance_id)
-          instance_ip=$(echo $instance_description | jq -r ".Reservations[0].Instances[0].PublicIpAddress")
-          echo ::set-output name=instance_ip::$instance_ip
 
 
       - name: Upgrade management UI helm release
