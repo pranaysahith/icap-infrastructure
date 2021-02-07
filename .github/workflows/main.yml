@@ -93,6 +93,7 @@ jobs:
             set -e
             BRANCH=${{ github.event.inputs.management_ui_branch }}
             ICAP_REPO=${{ github.event.inputs.icap_repo }}
+            GITHUB_SHA=${{ github.sha }}
             TAG=${BRANCH}-${GITHUB_SHA::7}
             mkdir ~/temp/ && cd temp/
             git clone https://github.com/${ICAP_REPO}.git && cd icap-infrastructure && git checkout ${{ github.event.inputs.icap_branch }} && cd scripts
