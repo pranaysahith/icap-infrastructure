@@ -2,7 +2,7 @@ name: deploy_icap
 env:
   REPOSITORY: glasswallsolutions
   IMAGE: k8-proxy-icap-management-ui
-on:
+on: 
   workflow_dispatch:
     inputs:
       management_ui_repo:
@@ -29,9 +29,6 @@ on:
         description: AWS region used for deployment
         default: eu-west-1
         required: true
-  push: 
-    branches:
-      - "actions"
 
 jobs:
   build-push-docker-image:
