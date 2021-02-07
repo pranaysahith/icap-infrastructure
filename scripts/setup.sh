@@ -20,7 +20,7 @@ echo "Done installing helm"
 # get source code, we clone in in home dir so we can easilly update in place
 cd ~
 ICAP_BRANCH=${ICAP_BRANCH:-k8-main}
-ICAP_REPO=${k8-proxy/icap-infrastructure:-k8-main/icap-infrastructure}
+ICAP_REPO=${ICAP_REPO:-k8-main/icap-infrastructure}
 git clone https://github.com/${ICAP_REPO}.git -b $ICAP_BRANCH && cd icap-infrastructure
 
 # Admin ui default credentials
