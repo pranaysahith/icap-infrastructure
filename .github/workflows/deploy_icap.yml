@@ -12,7 +12,7 @@ on:
       management_ui_branch:
         description: ICAP management UI branch to use
         default: main
-        required: false
+        required: true
       icap_repo:
         description: icap-infrastructure repo to use
         default: k8-proxy/icap-infrastructure
@@ -24,11 +24,11 @@ on:
       icap_ami:
         description: Base Ubuntu 20 AMI ID
         default: ami-022e8cc8f0d3c52fd
-        required: false
+        required: true
       aws_region:
         description: AWS region used for deployment
         default: eu-west-1
-        required: false
+        required: true
   push: 
     branches:
       - "actions"
