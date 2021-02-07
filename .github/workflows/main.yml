@@ -67,10 +67,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ github.event.inputs.aws_region }}
 
-      - name: Get or Create ec2 instance
+      - name: Create ec2 instance
         id: deploy
         run: |
-          # Get or Create an instance with name "<management-ui-branch>-icap-server"
+          # Create an instance with name "<management-ui-branch>-icap-server"
           MANAGEMENT_UI_REPO=${{ github.event.inputs.management_ui_repo }}
           MANAGEMENT_UI_BRANCH=${{ github.event.inputs.management_ui_branch }}
           MANAGEMENT_UI_BRANCH=${MANAGEMENT_UI_BRANCH:-default}
@@ -119,7 +119,7 @@ jobs:
             rm -rf env
       
       - name: Delete if deployment fails
-        if: ${{ failure() }} || ${{ cancelled() }}
+        if: failure() || cancelled()
         run: |
           INSTANCE_ID=${{ github.deploy.outputs.instance_id }}
           echo "Failed to deploy ICAP server, deleting the instance"
