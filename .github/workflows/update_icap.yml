@@ -77,7 +77,6 @@ jobs:
               GITHUB_SHA=${{ github.sha }}
               TAG=${MANAGEMENT_UI_BRANCH}-${GITHUB_SHA::7}
               cd ~/icap-infrastructure
-              git checkout ${{ github.event.inputs.icap_branch }}
               helm upgrade --install administration -n management-ui \
               --set imagestore.icapmanagementui.repository=${{ env.REPOSITORY }}/${{ env.IMAGE }} \
               --set imagestore.icapmanagementui.tag=${TAG}} \
