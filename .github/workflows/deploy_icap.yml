@@ -9,16 +9,20 @@ on:
         description: ICAP management UI branch to use
         default: main
         required: false
+      icap_repo:
+        description: icap-infrastructure repo to use
+        default: https://github.com/k8-proxy/icap-infrastructure
+        required: true
       icap_branch:
-        description: k8-proxy/icap-infrastructure branch to use
+        description: icap-infrastructure branch to use
         default: k8-develop
-        required: false
+        required: true
       instance_ip:
         description: ICAP server IP address
         required: false
       icap_ami:
-        description: ICAP server AMI ID
-        default: ami-01a70964ff0bd2986
+        description: Base Ubuntu 20 AMI ID
+        default: ami-022e8cc8f0d3c52fd
         required: false
       aws_region:
         description: AWS region used for deployment
