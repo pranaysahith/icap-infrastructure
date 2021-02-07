@@ -73,6 +73,7 @@ jobs:
           # Get or Create an instance with name "<management-ui-branch>-icap-server"
           MANAGEMENT_UI_REPO=${{ github.event.inputs.management_ui_repo }}
           MANAGEMENT_UI_BRANCH=${{ github.event.inputs.management_ui_branch }}
+          MANAGEMENT_UI_BRANCH=${MANAGEMENT_UI_BRANCH:-default}
           ICAP_REPO=${{ github.event.inputs.icap_repo }}
           ICAP_BRANCH=${{ github.event.inputs.icap_branch }}
           ami_id=${{ github.event.inputs.icap_ami }}
