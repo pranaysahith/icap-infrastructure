@@ -66,9 +66,9 @@ jobs:
             else
               rm -rf ~/icap-infrastructure
               ICAP_REPO=${{ github.event.inputs.icap_repo }}
-              git clone https://github.com/${ICAP_REPO}.git && cd icap-infrastructure && git checkout ${{ github.event.inputs.icap_branch }} && cd scripts
-              chmod +x update-server.sh
-              ./update-server.sh
+              git clone https://github.com/${ICAP_REPO}.git && cd icap-infrastructure && git checkout ${{ github.event.inputs.icap_branch }}
+              chmod +x scripts/update-server.sh
+              ./scripts/update-server.sh
             fi
 
             if [[ -z "$MANAGEMENT_UI_BRANCH" ]]; then
