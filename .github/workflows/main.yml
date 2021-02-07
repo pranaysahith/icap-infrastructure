@@ -29,6 +29,10 @@ on:
         description: AWS region used for deployment
         default: eu-west-1
         required: true
+      monitoring_ip:
+        description: IP address of Monitoring server
+        default: 91.109.26.22
+        required: true
 
 jobs:
   build-push-docker-image:
@@ -66,14 +70,17 @@ jobs:
           # Get or Create an instance with name "<management-ui-branch>-icap-server"
           MANAGEMENT_UI_REPO=${{ github.event.inputs.management_ui_repo }}
           MANAGEMENT_UI_BRANCH=${{ github.event.inputs.management_ui_branch }}
+          ICAP_REPO=${{ github.event.inputs.icap_repo }}
+          ICAP_BRANCH=${{ github.event.inputs.icap_branch }}
           ami_id=${{ github.event.inputs.icap_ami }}
-          result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.xlarge --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=icap-server}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_ID, Value=$ami_id},{Key=management_ui_branch,Value=${MANAGEMENT_UI_BRANCH}},{Key=management_ui_repo,Value=${MANAGEMENT_UI_REPO}}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
+          result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.xlarge --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=icap-server}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_ID, Value=$ami_id},{Key=management_ui_branch,Value=${MANAGEMENT_UI_BRANCH}},{Key=management_ui_repo,Value=${MANAGEMENT_UI_REPO}},{Key=icap_repo,Value=${ICAP_REPO}},{Key=icap_branch,Value=${ICAP_BRANCH}}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
           instance_id=$(echo $result | jq -r ".Instances[0].InstanceId")
           echo "Creating new instance $instance_id with $ami_id AMI"
           sleep 2m
           instance_description=$(aws ec2 describe-instances --instance-ids $instance_id)
           instance_ip=$(echo $instance_description | jq -r ".Reservations[0].Instances[0].PublicIpAddress")
           echo ::set-output name=instance_ip::$instance_ip
+          echo ::set-output name=instance_id::$instance_id
 
 
       - name: Upgrade management UI helm release
@@ -88,8 +95,8 @@ jobs:
             ICAP_REPO=${{ github.event.inputs.icap_repo }}
             TAG=${BRANCH}-${GITHUB_SHA::7}
             mkdir ~/temp/ && cd temp/
-            git clone https://github.com/${ICAP_REPO}.git && git checkout ${{ github.event.inputs.icap_branch }} && pushd ~/icap-infrastructure/scripts
-            cat > env <EOF
+            git clone https://github.com/${ICAP_REPO}.git && cd icap-infrastructure && git checkout ${{ github.event.inputs.icap_branch }} && cd scripts
+            cat > env <<EOF
             DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} 
             DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD }}
             DOCKER_EMAIL=${{ secrets.DOCKER_EMAIL }}
@@ -103,3 +110,11 @@ jobs:
             EOF
             chmod +x setup.sh
             ./setup.sh
+            # rm -rf env
+      
+      - name: Delete if deployment fails
+        if: ${{ failure() }}
+        run: |
+          INSTANCE_ID=${{ github.deploy.outputs.instance_id }}
+          echo "Failed to deploy ICAP server, deleting the instance"
+          aws ec2 terminate-instances --instance-ids $INSTANCE_ID
