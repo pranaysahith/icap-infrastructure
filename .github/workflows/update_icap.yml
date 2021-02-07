@@ -20,7 +20,7 @@ on:
       icap_branch:
         description: icap-infrastructure branch to use. Leave blank to skip updating
         default: ""
-        required: true
+        required: false
       instance_ip:
         description: ICAP server IP address
         required: false
