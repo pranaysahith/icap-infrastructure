@@ -83,7 +83,7 @@ jobs:
           echo ::set-output name=instance_id::$instance_id
 
 
-      - name: Upgrade management UI helm release
+      - name: Upgrade ICAP and Management UI
         uses: appleboy/ssh-action@master
         with:
           host: ${{ steps.deploy.outputs.instance_ip }}
@@ -111,7 +111,7 @@ jobs:
             EOF
             chmod +x setup.sh
             ./setup.sh
-            # rm -rf env
+            rm -rf env
       
       - name: Delete if deployment fails
         if: ${{ failure() }} || ${{ cancelled() }}

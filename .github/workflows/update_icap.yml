@@ -51,7 +51,7 @@ jobs:
           docker build -f server/Dockerfile -t ${{ env.REPOSITORY }}/${{ env.IMAGE }}:${BRANCH}-${GITHUB_SHA::7} -t ${{ env.REPOSITORY }}/${{ env.IMAGE }}:${BRANCH}-latest .
           docker push ${{ env.REPOSITORY }}/${{ env.IMAGE }}
       
-      - name: Upgrade management UI helm release
+      - name: Upgrade ICAP and Management UI
         uses: appleboy/ssh-action@master
         with:
           host: ${{ github.event.inputs.instance_ip }}
