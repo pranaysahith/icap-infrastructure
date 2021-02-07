@@ -1,0 +1,106 @@
+name: deploy_icap
+env:
+  REPOSITORY: glasswallsolutions
+  IMAGE: k8-proxy-icap-management-ui
+on:
+  workflow_dispatch:
+    inputs:
+      management_ui_repo:
+        description: Management UI repo
+        default: filetrust/icap-management-ui
+        required: true
+      management_ui_branch:
+        description: ICAP management UI branch to use
+        default: main
+        required: false
+      icap_repo:
+        description: icap-infrastructure repo to use
+        default: k8-proxy/icap-infrastructure
+        required: true
+      icap_branch:
+        description: icap-infrastructure branch to use
+        default: k8-develop
+        required: true
+      icap_ami:
+        description: Base Ubuntu 20 AMI ID
+        default: ami-022e8cc8f0d3c52fd
+        required: false
+      aws_region:
+        description: AWS region used for deployment
+        default: eu-west-1
+        required: false
+
+jobs:
+  build-push-docker-image:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.management_ui_repo }}
+          ref: ${{ github.event.inputs.management_ui_branch }}
+
+      - name: Docker Login
+        uses: docker/login-action@v1.6.0
+        with:
+          username: k8serviceaccount
+          password: ${{ secrets.ICAPDOCKERSECRET }}
+      
+      - name: Build and Push Docker Image
+        run: |
+          BRANCH=$(echo ${{ github.event.inputs.management_ui_branch }} | cut -d"/" -f3)
+          docker build -f server/Dockerfile -t ${{ env.REPOSITORY }}/${{ env.IMAGE }}:${BRANCH}-${GITHUB_SHA::7} -t ${{ env.REPOSITORY }}/${{ env.IMAGE }}:${BRANCH}-latest .
+          docker push ${{ env.REPOSITORY }}/${{ env.IMAGE }}
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.aws_region }}
+
+      - name: Get or Create ec2 instance
+        id: deploy
+        run: |
+          # Get or Create an instance with name "<management-ui-branch>-icap-server"
+          MANAGEMENT_UI_REPO=${{ github.event.inputs.management_ui_repo }}
+          MANAGEMENT_UI_BRANCH=${{ github.event.inputs.management_ui_branch }}
+          ami_id=${{ github.event.inputs.icap_ami }}
+          result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.xlarge --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=icap-server}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_ID, Value=$ami_id},{Key=management_ui_branch,Value=${MANAGEMENT_UI_BRANCH}},{Key=management_ui_repo,Value=${MANAGEMENT_UI_REPO}}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
+          instance_id=$(echo $result | jq -r ".Instances[0].InstanceId")
+          echo "Creating new instance $instance_id with $ami_id AMI"
+          sleep 2m
+          instance_description=$(aws ec2 describe-instances --instance-ids $instance_id)
+          instance_ip=$(echo $instance_description | jq -r ".Reservations[0].Instances[0].PublicIpAddress")
+          echo ::set-output name=instance_ip::$instance_ip
+
+
+      - name: Upgrade management UI helm release
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ steps.deploy.outputs.instance_ip }}
+          username: ubuntu
+          key: '${{ secrets.SSH_KEY }}'
+          script: |
+            set -e
+            BRANCH=${{ github.event.inputs.management_ui_branch }}
+            ICAP_REPO=${{ github.event.inputs.icap_repo }}
+            TAG=${BRANCH}-${GITHUB_SHA::7}
+            mkdir ~/temp/ && cd temp/
+            git clone https://github.com/${ICAP_REPO}.git && pushd ~/icap-infrastructure/scripts
+            git checkout ${{ github.event.inputs.icap_branch }}
+            cat > env <EOF
+            DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} 
+            DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD }}
+            DOCKER_EMAIL=${{ secrets.DOCKER_EMAIL }}
+            MONITORING_IP=${{ github.event.inputs.monitoring_ip }}
+            MONITORING_USER=${{ secrets.MONITORING_USER }}
+            MONITORING_PASSWORD=${{ secrets.MONITORING_PASSWORD }}
+            ICAP_REPO=${{ github.event.inputs.icap_repo }}
+            ICAP_BRANCH=${{ github.event.inputs.icap_branch }}
+            MANAGEMENT_IMAGE=${{ env.REPOSITORY }}/${{ env.IMAGE }}
+            MANAGEMENT_TAG=${TAG}
+            EOF
+            chmod +x setup.sh
+            ./setup.sh
