@@ -1,4 +1,4 @@
-name: CD
+name: deploy_icap
 env:
   REPOSITORY: glasswallsolutions
   IMAGE: k8-proxy-icap-management-ui
