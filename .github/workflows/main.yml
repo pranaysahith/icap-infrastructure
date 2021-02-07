@@ -119,7 +119,7 @@ jobs:
             rm -rf env
       
       - name: Delete if deployment fails
-        if: failure() || cancelled()
+        if: ${{ failure() || cancelled() }}
         run: |
           INSTANCE_ID=${{ github.deploy.outputs.instance_id }}
           echo "Failed to deploy ICAP server, deleting the instance"
