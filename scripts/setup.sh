@@ -91,9 +91,13 @@ kubectl create -n management-ui secret generic smtpsecret \
 	--from-literal=SmtpSecureSocketOptions='http://management-ui:8080'
 
 pushd administration
-helm upgrade administration --install --namespace management-ui \
-    --set imagestore.icapmanagementui.repository=${MANAGEMENT_IMAGE} \
-    --set imagestore.icapmanagementui.tag=${MANAGEMENT_TAG} .
+if [[ -z $MANAGEMENT_TAG ]]; then
+	helm upgrade administration --install --namespace management-ui .
+else
+	helm upgrade administration --install --namespace management-ui \
+		--set imagestore.icapmanagementui.repository=${MANAGEMENT_IMAGE} \
+		--set imagestore.icapmanagementui.tag=${MANAGEMENT_TAG} .
+fi
 popd
 
 cd ..

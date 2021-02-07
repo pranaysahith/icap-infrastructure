@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       management_ui_repo:
-        description: Management UI repo
+        description: management UI repo
         default: filetrust/icap-management-ui
         required: true
       management_ui_branch:
-        description: ICAP management UI branch to use
-        default: main
-        required: true
+        description: ICAP management UI branch to use. Leave blank to use default management UI image
+        default: ''
+        required: false
       icap_repo:
         description: icap-infrastructure repo to use
         default: k8-proxy/icap-infrastructure
@@ -40,18 +40,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
+        if: github.event.inputs.management_ui_branch != ''
         uses: actions/checkout@v2
         with:
           repository: ${{ github.event.inputs.management_ui_repo }}
           ref: ${{ github.event.inputs.management_ui_branch }}
 
       - name: Docker Login
+        if: github.event.inputs.management_ui_branch != ''
         uses: docker/login-action@v1.6.0
         with:
           username: k8serviceaccount
           password: ${{ secrets.ICAPDOCKERSECRET }}
       
       - name: Build and Push Docker Image
+        if: github.event.inputs.management_ui_branch != ''
         run: |
           BRANCH=$(echo ${{ github.event.inputs.management_ui_branch }} | cut -d"/" -f3)
           docker build -f server/Dockerfile -t ${{ env.REPOSITORY }}/${{ env.IMAGE }}:${BRANCH}-${GITHUB_SHA::7} -t ${{ env.REPOSITORY }}/${{ env.IMAGE }}:${BRANCH}-latest .
