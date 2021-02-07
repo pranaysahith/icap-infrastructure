@@ -29,6 +29,9 @@ on:
         description: AWS region used for deployment
         default: eu-west-1
         required: false
+  push: 
+    branches:
+      - "actions"
 
 jobs:
   build-push-docker-image:
