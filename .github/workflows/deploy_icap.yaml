@@ -2,7 +2,8 @@ name: deploy_icap
 env:
   REPOSITORY: glasswallsolutions
   IMAGE: k8-proxy-icap-management-ui
-on: [fork]
+on:
+  workflow_dispatch:
 #     inputs:
 #       management_ui_repo:
 #         description: Management UI repo
