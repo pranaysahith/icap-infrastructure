@@ -5,6 +5,10 @@ env:
 on: 
   workflow_dispatch:
     inputs:
+      instance_name:
+        description: EC2 instance name
+        default: icap-server
+        required: true
       management_ui_repo:
         description: management UI repo
         default: filetrust/icap-management-ui
@@ -77,7 +81,8 @@ jobs:
           ICAP_REPO=${{ github.event.inputs.icap_repo }}
           ICAP_BRANCH=${{ github.event.inputs.icap_branch }}
           ami_id=${{ github.event.inputs.icap_ami }}
-          result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.xlarge --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=icap-server}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_ID, Value=$ami_id},{Key=management_ui_branch,Value=${MANAGEMENT_UI_BRANCH}},{Key=management_ui_repo,Value=${MANAGEMENT_UI_REPO}},{Key=icap_repo,Value=${ICAP_REPO}},{Key=icap_branch,Value=${ICAP_BRANCH}}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
+          INSTANCE_NAME=${{ github.event.inputs.instance_name }}
+          result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.xlarge --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=${INSTANCE_NAME}}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_ID, Value=$ami_id},{Key=management_ui_branch,Value=${MANAGEMENT_UI_BRANCH}},{Key=management_ui_repo,Value=${MANAGEMENT_UI_REPO}},{Key=icap_repo,Value=${ICAP_REPO}},{Key=icap_branch,Value=${ICAP_BRANCH}}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
           instance_id=$(echo $result | jq -r ".Instances[0].InstanceId")
           echo "Creating new instance $instance_id with $ami_id AMI"
           sleep 2m
