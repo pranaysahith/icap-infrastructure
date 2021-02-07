@@ -79,6 +79,7 @@ jobs:
           sleep 2m
           instance_description=$(aws ec2 describe-instances --instance-ids $instance_id)
           instance_ip=$(echo $instance_description | jq -r ".Reservations[0].Instances[0].PublicIpAddress")
+          echo "$instance_ip is the instance IP address"
           echo ::set-output name=instance_ip::$instance_ip
           echo ::set-output name=instance_id::$instance_id
 
