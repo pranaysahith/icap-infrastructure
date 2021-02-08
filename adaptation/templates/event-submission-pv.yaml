@@ -11,7 +11,7 @@ spec:
     storage: {{ .Values.transactionstore.storage }}
     storage: 3Gi
   hostPath:
-    path: /run/desktop/mnt/host/c/transactionquery
+    path: /var/local/rancher/host/c/transactionquery
     type: ""
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem

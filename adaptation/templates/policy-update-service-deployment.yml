@@ -13,6 +13,10 @@ spec:
     metadata:
       labels:
         app: {{ .Values.policyupdateservice.applabel }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: {{ .Values.prometheus.metricspath }}
+        prometheus.io/port: "{{ .Values.prometheus.metricsport }}"        
     spec:
       serviceAccountName: {{ .Values.serviceAccount.policyupdatename }}
       containers:     

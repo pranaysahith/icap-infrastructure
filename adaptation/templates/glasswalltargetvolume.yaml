@@ -12,4 +12,4 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/run/desktop/mnt/host/c/rebuild-data-out"
+    path: "/var/local/rancher/host/c/rebuild-data-out"

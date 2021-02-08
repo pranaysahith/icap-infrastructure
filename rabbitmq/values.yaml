@@ -11,3 +11,4 @@ rabbitmqController:
   cpu: 100m
   image: rabbitmq:3-management
   app: taskQueue
+  component: rabbitmq

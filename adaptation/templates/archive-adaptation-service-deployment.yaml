@@ -11,6 +11,10 @@ spec:
     metadata:
       labels:
         app: {{ .Values.archiveadaptationservice.name }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: {{ .Values.prometheus.metricspath }}
+        prometheus.io/port: "{{ .Values.prometheus.metricsport }}"        
     spec:
       serviceAccountName: {{ .Values.serviceAccount.archiveadaptationname  }}
       containers:
@@ -27,6 +31,8 @@ spec:
           value: {{ .Values.archiveadaptationservice.exchange }}
         - name: METRICS_PORT
           value: "{{ .Values.prometheus.metricsport }}"
+        - name: PUSHGATEWAY_ENDPOINT
+          value: {{ .Values.prometheus.pushgatewayendpoint }}          
         - name: INPUT_MOUNT
           value: {{ .Values.volumemountpath.source }}
         - name: OUTPUT_MOUNT
