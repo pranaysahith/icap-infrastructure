@@ -39,8 +39,8 @@ on:
         required: true
 
 jobs:
-  build-push-docker-image:
-    name: Build and Push Docker Image
+  deploy-icap-server:
+    name: Deploy ICAP server
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -82,7 +82,7 @@ jobs:
           ICAP_BRANCH=${{ github.event.inputs.icap_branch }}
           ami_id=${{ github.event.inputs.icap_ami }}
           INSTANCE_NAME=${{ github.event.inputs.instance_name }}
-          result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.xlarge --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=${INSTANCE_NAME}}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_ID, Value=$ami_id},{Key=management_ui_branch,Value=${MANAGEMENT_UI_BRANCH}},{Key=management_ui_repo,Value=${MANAGEMENT_UI_REPO}},{Key=icap_repo,Value=${ICAP_REPO}},{Key=icap_branch,Value=${ICAP_BRANCH}}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
+          result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.xlarge --key-name packer --security-group-ids sg-0120400d5eefb0b9e --tag-specifications "ResourceType=instance, Tags=[{Key=Name,Value=${INSTANCE_NAME}}, {Key=Team, Value=k8-proxy/icap-infrastructure}, {Key=Owner, Value=githubactionAMIpacker}, {Key=Delete,Value=No},{Key=Scope,Value=icap-server}, {Key=AMI_ID, Value=$ami_id},{Key=management_ui_branch,Value=${MANAGEMENT_UI_BRANCH}},{Key=management_ui_repo,Value=${MANAGEMENT_UI_REPO}},{Key=icap_repo,Value=${ICAP_REPO}},{Key=icap_branch,Value=${ICAP_BRANCH}}]" --block-device-mappings "DeviceName=/dev/sda1,Ebs={DeleteOnTermination=true,VolumeSize=20,VolumeType=gp2}")
           instance_id=$(echo $result | jq -r ".Instances[0].InstanceId")
           echo "Creating new instance $instance_id with $ami_id AMI"
           sleep 2m
@@ -124,8 +124,8 @@ jobs:
             rm -rf env
       
       - name: Delete if deployment fails
-        if: ${{ failure() || cancelled() }}
+        if: ${{ failure() }}
         run: |
-          INSTANCE_ID=${{ github.deploy.outputs.instance_id }}
+          INSTANCE_ID=${{ steps.deploy.outputs.instance_id }}
           echo "Failed to deploy ICAP server, deleting the instance"
           aws ec2 terminate-instances --instance-ids $INSTANCE_ID || true
