@@ -100,7 +100,7 @@ kubectl create -n management-ui secret generic smtpsecret \
 	--from-literal=TokenLifetime='00:01:00' \
 	--from-literal=EncryptionSecret='12345678901234567890123456789012' \
 	--from-literal=ManagementUIEndpoint='http://management-ui:8080' \
-	--from-literal=SmtpSecureSocketOptions='http://management-ui:8080'
+	--from-literal=SmtpSecureSocketOptions='http://management-ui:8080' || true
 
 pushd administration
 if [[ -z $MANAGEMENT_TAG ]]; then
