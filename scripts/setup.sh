@@ -87,10 +87,6 @@ kubectl create -n management-ui secret generic transactionqueryserviceref --from
 kubectl create -n management-ui secret generic policyupdateserviceref --from-literal=username=policy-management --from-literal=password='long-password'
 kubectl create -n management-ui secret generic ncfspolicyupdateserviceref --from-literal=username=policy-update --from-literal=password='long-password'
 
-pushd administration
-helm upgrade administration --values custom-values.yaml --install . --namespace management-ui
-popd
-
 kubectl create -n management-ui secret generic smtpsecret \
 	--from-literal=SmtpHost=$SMTPHOST \
 	--from-literal=SmtpPort=$SMTPPORT \
@@ -104,9 +100,10 @@ kubectl create -n management-ui secret generic smtpsecret \
 
 pushd administration
 if [[ -z $MANAGEMENT_TAG ]]; then
-	helm upgrade administration --install --namespace management-ui .
+	helm upgrade administration --values custom-values.yaml --install . --namespace management-ui
 else
 	helm upgrade administration --install --namespace management-ui \
+		--values custom-values.yaml \
 		--set imagestore.icapmanagementui.repository=${MANAGEMENT_IMAGE} \
 		--set imagestore.icapmanagementui.tag=${MANAGEMENT_TAG} .
 fi
