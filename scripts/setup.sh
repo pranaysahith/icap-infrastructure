@@ -100,10 +100,9 @@ kubectl create -n management-ui secret generic ncfspolicyupdateserviceref --from
 
 pushd administration
 if [[ -z $MANAGEMENT_TAG ]]; then
-	helm upgrade administration --values custom-values.yaml --install . --namespace management-ui
+	helm upgrade administration --install --namespace management-ui .
 else
 	helm upgrade administration --install --namespace management-ui \
-		--values custom-values.yaml \
 		--set imagestore.icapmanagementui.repository=${MANAGEMENT_IMAGE} \
 		--set imagestore.icapmanagementui.tag=${MANAGEMENT_TAG} .
 fi
