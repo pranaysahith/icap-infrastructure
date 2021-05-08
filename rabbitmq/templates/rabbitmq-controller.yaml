@@ -23,3 +23,6 @@ spec:
         resources:
           limits:
             cpu: {{ .Values.rabbitmqController.cpu }}
+        env:
+          - RABBITMQ_DEFAULT_USER: {{ .Values.rabbitmqController.username }}
+          - RABBITMQ_DEFAULT_PASS: {{ .Values.rabbitmqController.password }}

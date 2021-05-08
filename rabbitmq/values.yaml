@@ -12,3 +12,5 @@ rabbitmqController:
   image: rabbitmq:3-management
   app: taskQueue
   component: rabbitmq
+  username: guest
+  password: guest
