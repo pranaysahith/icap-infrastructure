@@ -24,5 +24,7 @@ spec:
           limits:
             cpu: {{ .Values.rabbitmqController.cpu }}
         env:
-          - RABBITMQ_DEFAULT_USER: {{ .Values.rabbitmqController.username }}
-          - RABBITMQ_DEFAULT_PASS: {{ .Values.rabbitmqController.password }}
+          - name: RABBITMQ_DEFAULT_USER
+            value: {{ .Values.rabbitmqController.username }}
+          - name: RABBITMQ_DEFAULT_PASS
+            value: {{ .Values.rabbitmqController.password }}
