@@ -5,8 +5,12 @@ managementui:
     port: 8080
   service:
     name: icap-management-ui-service
-    port: 8080
-    nodeport: 31829
+    port: 80
+  ingress:
+    name: icap-management-ui-ingress
+    port: 80
+    host: management-ui-develop.uksouth.cloudapp.azure.com
+    path: /(.*)
   config:
     transactionEventApiUrl: https://transaction-query-aggregator/api/v1
     policyManagementApiUrl: https://policy-management-api/api/v1
@@ -19,7 +23,7 @@ policymanagementapi:
     type: ClusterIP
     port: 443
   shareName: transactions
-  storage: 20Gi
+  storage: 100Gi
   configuration:
     ASPNETCORE_URLS: "https://+:443"
   deployment:
@@ -75,7 +79,7 @@ identitymanagementservice:
   replicaCount: 1
   imagePullSecrets: []
   shareName: transactions
-  storage: 20Gi
+  storage: 100Gi
   service:
     type: ClusterIP
     port: 443
@@ -98,40 +102,48 @@ identitymanagementservice:
 imagestore:
   icapmanagementui:
     registry: ""
-    repository: azopat/icap-management-ui
-    tag: latest
+    repository: glasswallsolutions/icap-management-ui
+    tag: main-c12c236
   policymanagementapi:
     registry: ""
     repository: glasswallsolutions/policy-management-api
-    tag: develop-64c36a0
+    tag: main-210e5ee
   transactionqueryaggregator:
     registry: ""
     repository: glasswallsolutions/transaction-query-aggregator
-    tag: develop-52a75f6
+    tag: main-dd638c0
   identitymanagementservice:
     registry: ""
     repository: glasswallsolutions/identity-management-service
-    tag: develop-86e8db1
+    tag: main-7f9e842
 secrets:
   containerregistry:
     dockerconfigjson: "<<https://gw-icap-keyvault.vault.azure.net/secrets/az-registry-dockerconfig>>"
   transactionqueryaggregator:
     transactionqueryserviceref:
-      username: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/transactionQueryServiceUsername>>"
-      password: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/transactionQueryServicePassword>>"
+      username: "<<https://gw-icap-keyvault.vault.azure.net/secrets/transactionQueryServiceUsername>>"
+      password: "<<https://gw-icap-keyvault.vault.azure.net/secrets/transactionQueryServicePassword>>"
   policymanagementapi:
     policystoresecret:
-      azurestorageaccountname: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/policyStoreAccountName>>"
-      azurestorageaccountkey: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/policyStoreAccountKey>>"
+      azurestorageaccountname: "<<https://gw-icap-keyvault.vault.azure.net/secrets/policyStoreAccountName>>"
+      azurestorageaccountkey: "<<https://gw-icap-keyvault.vault.azure.net/secrets/policyStoreAccountKey>>"
     policyupdateserviceref:
-      username: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/policyUpdateServiceUsername>>"
-      password: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/policyUpdateServicePassword>>"
+      username: "<<https://gw-icap-keyvault.vault.azure.net/secrets/policyUpdateServiceUsername>>"
+      password: "<<https://gw-icap-keyvault.vault.azure.net/secrets/policyUpdateServicePassword>>"
     ncfspolicyupdateserviceref:
-      username: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/ncfsPolicyUpdateServiceUsername>>"
-      password: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/ncfsPolicyUpdateServicePassword>>"
+      username: "<<https://gw-icap-keyvault.vault.azure.net/secrets/ncfsPolicyUpdateServiceUsername>>"
+      password: "<<https://gw-icap-keyvault.vault.azure.net/secrets/ncfsPolicyUpdateServicePassword>>"
   identitymanagementservice:
     identitymanagementservicesecrets:
-      TokenSecret: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/identityManagementTokenSecret>>"
+      TokenSecret: "<<https://gw-icap-keyvault.vault.azure.net/secrets/identityManagementTokenSecret>>"
+      ManagementUIEndpoint: "<<https://gw-icap-keyvault.vault.azure.net/secrets/managementUIEndpoint>>"
     userstoresecret:
-      azurestorageaccountname: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/userStoreAccountName>>"
-      azurestorageaccountkey: "<<https://gw-tfstate-Vault.vault.azure.net/secrets/userStoreAccountKey>>"
+      azurestorageaccountname: "<<https://gw-icap-keyvault.vault.azure.net/secrets/userStoreAccountName>>"
+      azurestorageaccountkey: "<<https://gw-icap-keyvault.vault.azure.net/secrets/userStoreAccountKey>>"
+      EncryptionSecret: "<<https://gw-icap-keyvault.vault.azure.net/secrets/userStoreEncryptionKey>>"
+    smtpsecret:
+      SmtpHost: "<<https://gw-icap-keyvault.vault.azure.net/secrets/smtpHost>>"
+      SmtpPort: "<<https://gw-icap-keyvault.vault.azure.net/secrets/smtpPort>>"
+      SmtpUser: "<<https://gw-icap-keyvault.vault.azure.net/secrets/smtpUser>>"
+      SmtpPass: "<<https://gw-icap-keyvault.vault.azure.net/secrets/smtpPass>>"
+      SmtpSecureSocketOptions: "<<https://gw-icap-keyvault.vault.azure.net/secrets/smtpSecureSocketOptions>>"

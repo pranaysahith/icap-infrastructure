@@ -1,6 +1,7 @@
 environment:
 prometheus:
   metricsport: 8081
+  metricspath: /metrics
 referencencfs:
   fullNameOverride: reference-ncfs
   applabel: reference-ncfs
@@ -130,4 +131,10 @@ imagestore:
   referencencfs:
     registry: ""
     repository: glasswallsolutions/reference-ncfs
-    tag: main-e0bfd42
+    tag: main-f543a19
+
+secrets:
+  ncfspolicyupdateservicesecret:
+    username: "<example>"
+    password: "<example>"
+    
