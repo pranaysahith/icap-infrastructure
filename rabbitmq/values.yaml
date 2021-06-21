@@ -5,6 +5,7 @@ rabbitmqService:
   managementPort: 15672
   component: rabbitmq
   app: taskQueue
+  type: ClusterIP
 rabbitmqController:
   name: rabbitmq-controller
   port: 5672
