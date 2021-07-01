@@ -14,8 +14,9 @@ spec:
     protocol: TCP
     name: openport
     targetPort: 1344
+    nodePort: 1344
   - port: 1345
     protocol: TCP
-    nodePort: 32323
+    nodePort: 1345
     name: tlsport
     targetPort: 1345
